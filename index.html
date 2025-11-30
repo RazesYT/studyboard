@@ -2445,9 +2445,11 @@ function closeExamsModal() {
     examsModal.style.display = 'none';
     closeAddExamForm();
   }, 300);
-  // Limpiar historial si estamos en el modal
+  // Limpiar historial si estamos en el modal (sin navegar)
   if (window.location.hash === '#exams') {
-    history.back();
+    // Usar replaceState en vez de back() para no activar navegación
+    const currentHash = subjectsScreen.classList.contains('active') ? '#subjects' : '#menu';
+    history.replaceState(null, '', currentHash);
   }
 }
 
