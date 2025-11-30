@@ -883,6 +883,7 @@ function crearTarjeta(nombre = 'Nueva asignatura', color = '#ff4d4d', doGuardar 
           <span style="font-weight:600;">Nota:</span>
           <div class="subject-grade" style="font-weight:600; min-width:40px; text-align:right;">-</div>
         </div>
+        <button class="open-tests-btn" aria-label="Ver pruebas evaluables" title="Ver pruebas" style="background:rgba(255,255,255,0.12); border:none; padding:6px 8px; border-radius:8px; cursor:pointer; font-size:16px; line-height:1; transition: transform 0.2s ease;">📝</button>
         <button class="grab-handle" aria-label="Arrastrar tarjeta" title="Arrastrar">≡</button>
       </div>
     </div>
@@ -927,6 +928,12 @@ function crearTarjeta(nombre = 'Nueva asignatura', color = '#ff4d4d', doGuardar 
     actualizarProgresoCard(card);
   });
 
+  // Botón para abrir modal de pruebas
+  card.querySelector('.open-tests-btn').addEventListener('click', (e) => {
+    e.stopPropagation();
+    openSubjectDetail(card);
+  });
+
   const titulo = card.querySelector('.titulo');
   let editTimeout = null;
   titulo.addEventListener('input', () => {
@@ -944,7 +951,7 @@ function crearTarjeta(nombre = 'Nueva asignatura', color = '#ff4d4d', doGuardar 
   });
 
   card.addEventListener('click', (ev) => {
-    const avoid = ev.target.closest('.grab-handle') || ev.target.closest('.controls') || ev.target.closest('.delete-btn') || ev.target.closest('.color-select') || ev.target.closest('.titulo');
+    const avoid = ev.target.closest('.grab-handle') || ev.target.closest('.controls') || ev.target.closest('.delete-btn') || ev.target.closest('.color-select') || ev.target.closest('.titulo') || ev.target.closest('.open-tests-btn');
     if (avoid) return;
 
     const now = Date.now();

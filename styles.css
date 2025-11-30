@@ -151,6 +151,20 @@ main { width: 100%; max-width: 520px; padding: 0 12px; }
   line-height: 1;
 }
 
+/* Botón para abrir pruebas evaluables */
+.open-tests-btn {
+  transition: transform 0.2s ease, background 0.2s ease !important;
+}
+
+.open-tests-btn:hover {
+  transform: translateY(-1px) !important;
+  background: rgba(255,255,255,0.2) !important;
+}
+
+.open-tests-btn:active {
+  transform: scale(0.95) !important;
+}
+
 /* Controles (ocultos por defecto) */
 .controls {
   margin-top: 10px;
