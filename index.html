@@ -707,27 +707,28 @@ function actualizarNotasCards() {
       let emoji = '';
       
       if (nota !== '-') {
-        const notaActual = parseFloat(nota);
+        // Calcular nota acumulada y porcentaje evaluado
+        let notaAcumulada = 0;
+        let porcentajeEvaluado = 0;
         
-        // Calcular porcentaje evaluado
-        let totalPonderacion = 0;
         if (card._tests && card._tests.length > 0) {
           card._tests.forEach(t => {
-            totalPonderacion += parseFloat(t.ponderacion) || 0;
+            const notaTest = parseFloat(t.nota) || 0;
+            const ponderacion = parseFloat(t.ponderacion) || 0;
+            notaAcumulada += (notaTest * ponderacion) / 100;
+            porcentajeEvaluado += ponderacion;
           });
         }
         
-        const porcentajeEvaluado = Math.min(100, totalPonderacion);
-        
-        // Calcular qué nota necesita en lo que falta para aprobar (5.0)
-        const notaObjetivo = 5.0;
+        porcentajeEvaluado = Math.min(100, porcentajeEvaluado);
         const porcentajeFaltante = 100 - porcentajeEvaluado;
         
+        // Calcular qué nota necesita en lo que falta para aprobar (5.0)
         let notaNecesariaRestante;
         if (porcentajeFaltante > 0) {
-          // (notaActual * porcentajeEvaluado + X * porcentajeFaltante) / 100 = 5
-          // X = (500 - notaActual * porcentajeEvaluado) / porcentajeFaltante
-          notaNecesariaRestante = (notaObjetivo * 100 - notaActual * porcentajeEvaluado) / porcentajeFaltante;
+          // notaAcumulada + (X * porcentajeFaltante / 100) = 5.0
+          // X = (5.0 - notaAcumulada) * 100 / porcentajeFaltante
+          notaNecesariaRestante = (5.0 - notaAcumulada) * 100 / porcentajeFaltante;
         } else {
           // Ya está todo evaluado
           notaNecesariaRestante = 0;
@@ -736,30 +737,28 @@ function actualizarNotasCards() {
         // Lógica de emoji basada en probabilidad de aprobar
         if (porcentajeEvaluado >= 100) {
           // Todo evaluado, usar nota final
-          if (notaActual >= 9) emoji = '🎉';
-          else if (notaActual >= 7) emoji = '😊';
-          else if (notaActual >= 5) emoji = '🙂';
+          const notaFinal = parseFloat(nota);
+          if (notaFinal >= 9) emoji = '🎉';
+          else if (notaFinal >= 7) emoji = '😊';
+          else if (notaFinal >= 5) emoji = '🙂';
           else emoji = '😰';
+        } else if (porcentajeEvaluado === 0) {
+          // Sin evaluaciones aún
+          emoji = '😐';
         } else if (notaNecesariaRestante <= 0) {
-          // Ya tiene aprobado seguro, independiente de lo que saque
+          // Ya tiene aprobado seguro (nota acumulada ≥ 5.0)
           emoji = '🎉';
         } else if (notaNecesariaRestante <= 5) {
-          // Necesita 5 o menos en lo que falta = MUY PROBABLE aprobar
-          if (notaActual >= 7) emoji = '😊'; // Va muy bien
-          else emoji = '🙂'; // Va bien, aprobará fácil
+          // Necesita ≤5 en lo que falta = MUY FÁCIL aprobar
+          emoji = '😊';
         } else if (notaNecesariaRestante <= 7) {
-          // Necesita entre 5-7 en lo que falta = PROBABLE aprobar
-          if (notaActual >= 5) emoji = '🙂'; // Ya lleva aprobado
-          else emoji = '😐'; // Está justo pero alcanzable
+          // Necesita 5-7 en lo que falta = PROBABLE aprobar
+          emoji = '🙂';
         } else if (notaNecesariaRestante <= 10) {
-          // Necesita entre 7-10 en lo que falta = DIFÍCIL pero posible
-          if (porcentajeEvaluado < 30) {
-            emoji = '😐'; // Empezó mal pero queda mucho
-          } else {
-            emoji = '😟'; // Complicado
-          }
+          // Necesita 7-10 en lo que falta = DIFÍCIL pero posible
+          emoji = '😐';
         } else {
-          // Necesita más de 10 = IMPOSIBLE aprobar
+          // Necesita >10 = IMPOSIBLE aprobar
           emoji = '😰';
         }
       }
@@ -769,6 +768,7 @@ function actualizarNotasCards() {
     actualizarProgresoCard(card);
   });
   updateAIRecommendation();
+  updateDashboard();
 }
 
 function actualizarProgresoCard(card) {
@@ -2047,9 +2047,9 @@ function updateDashboard() {
     : '-';
   const passed = subjects.filter(s => s.grade >= 5).length;
   const failed = subjects.filter(s => s.grade > 0 && s.grade < 5).length;
-  const totalEcts = currentSemester.subjects 
-    ? currentSemester.subjects.reduce((sum, s) => sum + (parseFloat(s.ects) || 0), 0)
-    : 0;
+  
+  // Calcular ECTS aprobados (6 ECTS por asignatura aprobada)
+  const totalEcts = passed * 6;
   
   document.getElementById('dash-average').textContent = average;
   document.getElementById('dash-passed').textContent = passed;
