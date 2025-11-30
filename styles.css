@@ -1752,3 +1752,142 @@ main { width: 100%; max-width: 520px; padding: 0 12px; }
   }
 }
 
+/* -------------------------
+   MODAL EXPORTAR PDF
+   ------------------------- */
+.export-modal {
+  max-width: 500px;
+  max-height: 90vh;
+}
+
+.export-content {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.export-options {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.export-options h3 {
+  color: var(--text);
+  font-size: 16px;
+  margin-bottom: 8px;
+}
+
+.export-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  background: var(--card-bg);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  border: 2px solid transparent;
+}
+
+.export-checkbox:hover {
+  background: rgba(99, 102, 241, 0.1);
+  border-color: rgba(99, 102, 241, 0.3);
+}
+
+.export-checkbox input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  accent-color: #6366f1;
+}
+
+.export-checkbox span {
+  font-size: 14px;
+  color: var(--text);
+  font-weight: 500;
+}
+
+.export-title-input {
+  margin-top: 8px;
+}
+
+.export-title-input label {
+  display: block;
+  font-size: 13px;
+  color: var(--text);
+  margin-bottom: 6px;
+  font-weight: 600;
+}
+
+.export-title-input input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 2px solid var(--input-border);
+  border-radius: 8px;
+  font-size: 14px;
+  font-family: 'Poppins', sans-serif;
+  background: var(--input-bg);
+  color: var(--text);
+  transition: border-color 0.2s ease;
+}
+
+.export-title-input input:focus {
+  outline: none;
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+.export-btn-primary {
+  width: 100%;
+  padding: 14px;
+  background: linear-gradient(135deg, #f59e0b, #ef4444);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  font-family: 'Poppins', sans-serif;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.export-btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(239, 68, 68, 0.3);
+}
+
+.export-progress {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 16px;
+  background: rgba(99, 102, 241, 0.1);
+  border-radius: 8px;
+  color: var(--text);
+  font-weight: 600;
+}
+
+.progress-spinner {
+  width: 24px;
+  height: 24px;
+  border: 3px solid rgba(99, 102, 241, 0.3);
+  border-top-color: #6366f1;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@media (max-width: 640px) {
+  .export-modal {
+    max-width: 95%;
+  }
+}
+

@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>StudyBoard Widget</title>
+<style>
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  background: transparent;
+  padding: 16px;
+}
+
+.widget-container {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 20px;
+  padding: 20px;
+  color: white;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.widget-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.widget-title {
+  font-size: 18px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.widget-date {
+  font-size: 12px;
+  opacity: 0.9;
+}
+
+.widget-stats {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.stat-box {
+  background: rgba(255,255,255,0.2);
+  backdrop-filter: blur(10px);
+  border-radius: 12px;
+  padding: 12px;
+  text-align: center;
+}
+
+.stat-value {
+  font-size: 24px;
+  font-weight: 700;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.stat-label {
+  font-size: 11px;
+  opacity: 0.9;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.next-exam {
+  background: rgba(255,255,255,0.15);
+  border-radius: 12px;
+  padding: 12px;
+  margin-bottom: 12px;
+}
+
+.next-exam-label {
+  font-size: 11px;
+  opacity: 0.8;
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.next-exam-info {
+  font-size: 14px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.next-exam-countdown {
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.quick-action {
+  background: rgba(255,255,255,0.25);
+  border: none;
+  border-radius: 10px;
+  padding: 10px;
+  color: white;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  width: 100%;
+  transition: all 0.2s ease;
+  text-decoration: none;
+  display: block;
+  text-align: center;
+}
+
+.quick-action:hover {
+  background: rgba(255,255,255,0.35);
+  transform: translateY(-2px);
+}
+
+.widget-footer {
+  margin-top: 12px;
+  text-align: center;
+  font-size: 10px;
+  opacity: 0.7;
+}
+
+/* Widget pequeño (para iOS) */
+.widget-small {
+  padding: 12px;
+  min-height: 120px;
+}
+
+.widget-small .widget-stats {
+  grid-template-columns: 1fr;
+  gap: 8px;
+}
+
+.widget-small .stat-box {
+  padding: 8px;
+}
+
+.widget-small .stat-value {
+  font-size: 20px;
+}
+
+.widget-small .next-exam,
+.widget-small .quick-action {
+  display: none;
+}
+
+/* Animaciones */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.widget-container {
+  animation: fadeIn 0.4s ease;
+}
+
+.stat-box {
+  animation: fadeIn 0.5s ease;
+}
+
+.stat-box:nth-child(1) { animation-delay: 0.1s; opacity: 0; animation-fill-mode: forwards; }
+.stat-box:nth-child(2) { animation-delay: 0.2s; opacity: 0; animation-fill-mode: forwards; }
+.stat-box:nth-child(3) { animation-delay: 0.3s; opacity: 0; animation-fill-mode: forwards; }
+.stat-box:nth-child(4) { animation-delay: 0.4s; opacity: 0; animation-fill-mode: forwards; }
+</style>
+</head>
+<body>
+
+<div class="widget-container" id="widget">
+  <div class="widget-header">
+    <div class="widget-title">
+      <span>📚</span>
+      <span>StudyBoard</span>
+    </div>
+    <div class="widget-date" id="widget-date"></div>
+  </div>
+  
+  <div class="widget-stats">
+    <div class="stat-box">
+      <span class="stat-value" id="stat-average">-</span>
+      <span class="stat-label">Promedio</span>
+    </div>
+    <div class="stat-box">
+      <span class="stat-value" id="stat-subjects">-</span>
+      <span class="stat-label">Asignaturas</span>
+    </div>
+    <div class="stat-box">
+      <span class="stat-value" id="stat-passed">-</span>
+      <span class="stat-label">Aprobadas</span>
+    </div>
+    <div class="stat-box">
+      <span class="stat-value" id="stat-ects">-</span>
+      <span class="stat-label">ECTS</span>
+    </div>
+  </div>
+  
+  <div class="next-exam" id="next-exam" style="display: none;">
+    <div class="next-exam-label">Próximo examen</div>
+    <div class="next-exam-info">
+      <span id="exam-name">-</span>
+      <span class="next-exam-countdown" id="exam-countdown">-</span>
+    </div>
+  </div>
+  
+  <a href="index.html" class="quick-action">
+    ➕ Añadir nota rápida
+  </a>
+  
+  <div class="widget-footer">
+    Última actualización: <span id="last-update">Ahora</span>
+  </div>
+</div>
+
+<script>
+// Cargar datos desde localStorage
+function loadWidgetData() {
+  try {
+    const cuatrimestres = JSON.parse(localStorage.getItem('cuatrimestres')) || [];
+    
+    // Buscar cuatrimestre activo (el primero no archivado)
+    const activeSemester = cuatrimestres.find(c => !c.archived) || cuatrimestres[0];
+    
+    if (!activeSemester || !activeSemester.asignaturas) {
+      showEmptyState();
+      return;
+    }
+    
+    // Calcular estadísticas
+    const subjects = activeSemester.asignaturas;
+    const grades = [];
+    
+    subjects.forEach(subject => {
+      if (subject.tests && subject.tests.length > 0) {
+        let suma = 0;
+        let totalPonderacion = 0;
+        
+        subject.tests.forEach(t => {
+          const nota = parseFloat(t.nota) || 0;
+          const ponderacion = parseFloat(t.ponderacion) || 0;
+          suma += nota * ponderacion;
+          totalPonderacion += ponderacion;
+        });
+        
+        if (totalPonderacion > 0) {
+          const notaFinal = suma / 100;
+          grades.push(notaFinal);
+        }
+      }
+    });
+    
+    // Actualizar widget
+    const average = grades.length > 0 
+      ? (grades.reduce((a, b) => a + b, 0) / grades.length).toFixed(1)
+      : '-';
+    
+    const passed = grades.filter(g => g >= 5).length;
+    const ects = passed * 6;
+    
+    document.getElementById('stat-average').textContent = average !== '-' ? average : '-';
+    document.getElementById('stat-subjects').textContent = subjects.length;
+    document.getElementById('stat-passed').textContent = passed;
+    document.getElementById('stat-ects').textContent = ects;
+    
+    // Añadir emoji al promedio
+    if (average !== '-') {
+      const avg = parseFloat(average);
+      let emoji = '';
+      if (avg >= 9) emoji = '🎉';
+      else if (avg >= 7) emoji = '😊';
+      else if (avg >= 5) emoji = '🙂';
+      else emoji = '😰';
+      document.getElementById('stat-average').textContent = `${average} ${emoji}`;
+    }
+    
+  } catch (error) {
+    console.error('Error loading widget data:', error);
+    showEmptyState();
+  }
+}
+
+function showEmptyState() {
+  document.getElementById('stat-average').textContent = '-';
+  document.getElementById('stat-subjects').textContent = '0';
+  document.getElementById('stat-passed').textContent = '0';
+  document.getElementById('stat-ects').textContent = '0';
+}
+
+// Actualizar fecha
+function updateDate() {
+  const now = new Date();
+  const dateStr = now.toLocaleDateString('es-ES', { 
+    day: 'numeric', 
+    month: 'short' 
+  });
+  document.getElementById('widget-date').textContent = dateStr;
+}
+
+// Actualizar hora de última actualización
+function updateLastUpdate() {
+  const now = new Date();
+  const timeStr = now.toLocaleTimeString('es-ES', { 
+    hour: '2-digit', 
+    minute: '2-digit' 
+  });
+  document.getElementById('last-update').textContent = timeStr;
+}
+
+// Detectar tamaño del widget (para iOS widgets)
+function detectWidgetSize() {
+  const width = window.innerWidth;
+  const widget = document.getElementById('widget');
+  
+  if (width < 200) {
+    widget.classList.add('widget-small');
+  }
+}
+
+// Inicializar
+detectWidgetSize();
+updateDate();
+updateLastUpdate();
+loadWidgetData();
+
+// Actualizar cada minuto
+setInterval(() => {
+  loadWidgetData();
+  updateLastUpdate();
+}, 60000);
+
+// Recargar cuando la ventana obtiene foco (usuario vuelve al widget)
+window.addEventListener('focus', () => {
+  loadWidgetData();
+  updateLastUpdate();
+});
+</script>
+
+</body>
+</html>

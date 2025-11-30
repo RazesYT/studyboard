@@ -35,6 +35,17 @@
         "sizes": "96x96",
         "type": "image/svg+xml"
       }]
+    },
+    {
+      "name": "Widget Información",
+      "short_name": "Widget",
+      "description": "Vista rápida de tus estadísticas",
+      "url": "/studyboard/widget.html",
+      "icons": [{ 
+        "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96' height='96'%3E%3Crect width='96' height='96' rx='20' fill='%236366f1'/%3E%3Ctext x='48' y='65' font-size='50' text-anchor='middle'%3E📊%3C/text%3E%3C/svg%3E", 
+        "sizes": "96x96",
+        "type": "image/svg+xml"
+      }]
     }
   ]
 }
