@@ -83,22 +83,13 @@ h1 { margin: 6px 0 4px; font-weight: 500; font-size: 20px; color: var(--text); }
 .upcoming-exams-alert {
   margin-top: 16px;
   background: linear-gradient(135deg, rgba(239, 68, 68, 0.1), rgba(220, 38, 38, 0.05));
-  border: 2px solid rgba(239, 68, 68, 0.3);
-  border-radius: 12px;
-  padding: 16px;
-  animation: slideDown 0.4s ease, pulse 2s ease-in-out infinite;
+  border-left: 4px solid #ef4444;
+  border-radius: 8px;
+  padding: 12px 16px;
+  animation: slideDown 0.4s ease;
   max-width: 600px;
   margin-left: auto;
   margin-right: auto;
-}
-
-@keyframes pulse {
-  0%, 100% { 
-    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4);
-  }
-  50% { 
-    box-shadow: 0 0 0 8px rgba(239, 68, 68, 0);
-  }
 }
 
 .exam-alerts-header {
@@ -106,13 +97,17 @@ h1 { margin: 6px 0 4px; font-weight: 500; font-size: 20px; color: var(--text); }
   font-size: 14px;
   color: #dc2626;
   margin-bottom: 12px;
-  text-align: center;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .exam-alerts-list {
   display: flex;
   flex-direction: column;
   gap: 8px;
+  max-height: none;
+  overflow: visible;
 }
 
 .exam-alert-item {
@@ -147,6 +142,10 @@ h1 { margin: 6px 0 4px; font-weight: 500; font-size: 20px; color: var(--text); }
   font-weight: 600;
   font-size: 13px;
   color: var(--text);
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .exam-alert-time {
@@ -154,6 +153,7 @@ h1 { margin: 6px 0 4px; font-weight: 500; font-size: 20px; color: var(--text); }
   font-size: 12px;
   color: #dc2626;
   white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .exam-alert-item.urgent .exam-alert-time {
@@ -174,6 +174,7 @@ h1 { margin: 6px 0 4px; font-weight: 500; font-size: 20px; color: var(--text); }
   font-size: 11px;
   color: #64748b;
   white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .exam-alerts-more {
@@ -186,7 +187,7 @@ h1 { margin: 6px 0 4px; font-weight: 500; font-size: 20px; color: var(--text); }
 
 .dark-mode .upcoming-exams-alert {
   background: linear-gradient(135deg, rgba(239, 68, 68, 0.15), rgba(220, 38, 38, 0.1));
-  border-color: rgba(239, 68, 68, 0.4);
+  border-left-color: #fca5a5;
 }
 
 .dark-mode .exam-alerts-header {

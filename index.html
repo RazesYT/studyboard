@@ -2632,15 +2632,15 @@ function checkUpcomingExams() {
   const topExams = upcomingExams.slice(0, 3);
   
   // Construir HTML del aviso
-  let alertHTML = '<div class="exam-alerts-header">';
+  let alertHTML = '<div class="exam-alerts-header"><span class="ai-icon">⚠️</span><span>';
   
   if (topExams.length === 1) {
-    alertHTML += '⚠️ Tienes 1 examen próximo';
+    alertHTML += 'Tienes 1 examen próximo';
   } else {
-    alertHTML += `⚠️ Tienes ${topExams.length} exámenes próximos`;
+    alertHTML += `Tienes ${topExams.length} exámenes próximos`;
   }
   
-  alertHTML += '</div><div class="exam-alerts-list">';
+  alertHTML += '</span></div><div class="exam-alerts-list">';
   
   topExams.forEach(exam => {
     const examDate = new Date(exam.date + 'T00:00:00');
