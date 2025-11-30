@@ -717,46 +717,50 @@ function actualizarNotasCards() {
           });
         }
         
-        // Proyectar nota final (suponiendo que saca la misma nota en lo que falta)
         const porcentajeEvaluado = Math.min(100, totalPonderacion);
+        
+        // Calcular qué nota necesita en lo que falta para aprobar (5.0)
+        const notaObjetivo = 5.0;
         const porcentajeFaltante = 100 - porcentajeEvaluado;
         
-        let notaProyectada;
-        if (porcentajeEvaluado === 0) {
-          notaProyectada = 0;
-        } else if (porcentajeEvaluado >= 100) {
-          notaProyectada = notaActual;
+        let notaNecesariaRestante;
+        if (porcentajeFaltante > 0) {
+          // (notaActual * porcentajeEvaluado + X * porcentajeFaltante) / 100 = 5
+          // X = (500 - notaActual * porcentajeEvaluado) / porcentajeFaltante
+          notaNecesariaRestante = (notaObjetivo * 100 - notaActual * porcentajeEvaluado) / porcentajeFaltante;
         } else {
-          // Proyección: (nota_actual * % evaluado + nota_actual * % faltante) / 100
-          // Simplificado: nota_actual (asume continuidad)
-          notaProyectada = notaActual;
+          // Ya está todo evaluado
+          notaNecesariaRestante = 0;
         }
         
-        // Emoji basado en nota proyectada
-        if (notaProyectada >= 9) {
-          emoji = '🎉'; // Sobresaliente
-        } else if (notaProyectada >= 7) {
-          emoji = '😊'; // Notable
-        } else if (notaProyectada >= 5) {
-          emoji = '🙂'; // Aprobado
-        } else if (notaProyectada >= 4) {
-          // Entre 4 y 5: depende del % evaluado
-          if (porcentajeEvaluado < 50) {
-            emoji = '🙂'; // Aún tiene mucho margen para mejorar
-          } else if (porcentajeEvaluado < 75) {
-            emoji = '😐'; // Está justo, necesita esfuerzo
+        // Lógica de emoji basada en probabilidad de aprobar
+        if (porcentajeEvaluado >= 100) {
+          // Todo evaluado, usar nota final
+          if (notaActual >= 9) emoji = '🎉';
+          else if (notaActual >= 7) emoji = '😊';
+          else if (notaActual >= 5) emoji = '🙂';
+          else emoji = '😰';
+        } else if (notaNecesariaRestante <= 0) {
+          // Ya tiene aprobado seguro, independiente de lo que saque
+          emoji = '🎉';
+        } else if (notaNecesariaRestante <= 5) {
+          // Necesita 5 o menos en lo que falta = MUY PROBABLE aprobar
+          if (notaActual >= 7) emoji = '😊'; // Va muy bien
+          else emoji = '🙂'; // Va bien, aprobará fácil
+        } else if (notaNecesariaRestante <= 7) {
+          // Necesita entre 5-7 en lo que falta = PROBABLE aprobar
+          if (notaActual >= 5) emoji = '🙂'; // Ya lleva aprobado
+          else emoji = '😐'; // Está justo pero alcanzable
+        } else if (notaNecesariaRestante <= 10) {
+          // Necesita entre 7-10 en lo que falta = DIFÍCIL pero posible
+          if (porcentajeEvaluado < 30) {
+            emoji = '😐'; // Empezó mal pero queda mucho
           } else {
-            emoji = '😟'; // Poco margen, preocupante
+            emoji = '😟'; // Complicado
           }
         } else {
-          // Menos de 4
-          if (porcentajeEvaluado < 30) {
-            emoji = '😐'; // Recién empieza, puede recuperar
-          } else if (porcentajeEvaluado < 60) {
-            emoji = '😟'; // Necesita mejorar urgente
-          } else {
-            emoji = '😰'; // Difícil de recuperar
-          }
+          // Necesita más de 10 = IMPOSIBLE aprobar
+          emoji = '😰';
         }
       }
       
