@@ -1,0 +1,35 @@
+{
+  "name": "StudyBoard - Gestor de Asignaturas",
+  "short_name": "StudyBoard",
+  "description": "Gestor de asignaturas, notas y horarios universitarios",
+  "start_url": "/studyboard/",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#6366f1",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["education", "productivity"],
+  "screenshots": [],
+  "shortcuts": [
+    {
+      "name": "Ver asignaturas",
+      "short_name": "Asignaturas",
+      "description": "Accede directamente a tus asignaturas",
+      "url": "/studyboard/#subjects",
+      "icons": [{ "src": "icon-192.png", "sizes": "192x192" }]
+    }
+  ]
+}
