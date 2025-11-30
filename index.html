@@ -2627,7 +2627,7 @@ function deleteExam(examId) {
 }
 
 /* -------------------------
-   AVISOS DE EXÁMENES EN MENÚ PRINCIPAL
+   AVISOS DE EXÁMENES EN MENÚ PRINCIPAL - REDISEÑO
    ------------------------- */
 function checkUpcomingExams() {
   const alertContainer = document.getElementById('upcoming-exams-alert');
@@ -2652,21 +2652,21 @@ function checkUpcomingExams() {
   // Ordenar por fecha
   upcomingExams.sort((a, b) => new Date(a.date) - new Date(b.date));
   
-  // Tomar los 3 más próximos
-  const topExams = upcomingExams.slice(0, 3);
+  // Mostrar todos los exámenes próximos (sin límite)
+  const examsToShow = upcomingExams;
   
   // Construir HTML del aviso
   let alertHTML = '<div class="exam-alerts-header"><span class="ai-icon">⚠️</span><span>';
   
-  if (topExams.length === 1) {
+  if (examsToShow.length === 1) {
     alertHTML += 'Tienes 1 examen próximo';
   } else {
-    alertHTML += `Tienes ${topExams.length} exámenes próximos`;
+    alertHTML += `Tienes ${examsToShow.length} exámenes próximos`;
   }
   
   alertHTML += '</span></div><div class="exam-alerts-list">';
   
-  topExams.forEach(exam => {
+  examsToShow.forEach(exam => {
     const examDate = new Date(exam.date + 'T00:00:00');
     const daysUntil = Math.ceil((examDate - today) / (1000 * 60 * 60 * 24));
     
@@ -2693,18 +2693,14 @@ function checkUpcomingExams() {
     
     alertHTML += `
       <div class="exam-alert-item ${urgencyClass}">
-        <span class="exam-alert-subject">${exam.subjectName}</span>
-        <span class="exam-alert-time">${timeText}</span>
-        <span class="exam-alert-date">(${formattedDate})</span>
+        <div class="exam-alert-subject">${exam.subjectName}</div>
+        <div class="exam-alert-time">${timeText}</div>
+        <div class="exam-alert-date">${formattedDate}</div>
       </div>
     `;
   });
   
   alertHTML += '</div>';
-  
-  if (upcomingExams.length > 3) {
-    alertHTML += `<div class="exam-alerts-more">Y ${upcomingExams.length - 3} más...</div>`;
-  }
   
   alertContainer.innerHTML = alertHTML;
   alertContainer.style.display = 'block';
