@@ -48,6 +48,7 @@
   <header>
     <h1>📚 Mis Cursos</h1>
     <p class="hint">Selecciona un cuatrimestre para gestionar tus asignaturas.</p>
+    <div id="upcoming-exams-alert" class="upcoming-exams-alert" style="display:none;"></div>
   </header>
   <div class="search-container">
     <input type="text" id="global-search-input" placeholder="🔍 Buscar en todos los cuatrimestres..." aria-label="Buscar cuatrimestre o asignatura">
@@ -336,6 +337,7 @@ function showMenuScreen() {
   subjectsScreen.classList.remove('active');
   currentSemester = null;
   renderSemesters();
+  checkUpcomingExams();
 }
 
 function showSubjectsScreen(semester) {
@@ -712,6 +714,9 @@ function renderSemesters() {
 
     semestersContainer.appendChild(card);
   });
+  
+  // Verificar y mostrar avisos de exámenes próximos
+  checkUpcomingExams();
 }
 
 // Guardar orden de cuatrimestres
@@ -2494,6 +2499,10 @@ function saveExam() {
   closeAddExamForm();
   renderExams();
   showSyncIndicator('Examen añadido correctamente', 'success');
+  // Actualizar avisos en menú principal
+  if (menuScreen.classList.contains('active')) {
+    checkUpcomingExams();
+  }
 }
 
 function renderExams() {
@@ -2587,6 +2596,94 @@ function deleteExam(examId) {
   
   renderExams();
   showSyncIndicator('Examen eliminado', 'success');
+  // Actualizar avisos en menú principal
+  if (menuScreen.classList.contains('active')) {
+    checkUpcomingExams();
+  }
+}
+
+/* -------------------------
+   AVISOS DE EXÁMENES EN MENÚ PRINCIPAL
+   ------------------------- */
+function checkUpcomingExams() {
+  const alertContainer = document.getElementById('upcoming-exams-alert');
+  if (!alertContainer) return;
+  
+  const allExams = JSON.parse(localStorage.getItem('exams') || '[]');
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  
+  // Filtrar exámenes próximos (dentro de los próximos 7 días)
+  const upcomingExams = allExams.filter(exam => {
+    const examDate = new Date(exam.date + 'T00:00:00');
+    const daysUntil = Math.ceil((examDate - today) / (1000 * 60 * 60 * 24));
+    return daysUntil >= 0 && daysUntil <= 7;
+  });
+  
+  if (upcomingExams.length === 0) {
+    alertContainer.style.display = 'none';
+    return;
+  }
+  
+  // Ordenar por fecha
+  upcomingExams.sort((a, b) => new Date(a.date) - new Date(b.date));
+  
+  // Tomar los 3 más próximos
+  const topExams = upcomingExams.slice(0, 3);
+  
+  // Construir HTML del aviso
+  let alertHTML = '<div class="exam-alerts-header">';
+  
+  if (topExams.length === 1) {
+    alertHTML += '⚠️ Tienes 1 examen próximo';
+  } else {
+    alertHTML += `⚠️ Tienes ${topExams.length} exámenes próximos`;
+  }
+  
+  alertHTML += '</div><div class="exam-alerts-list">';
+  
+  topExams.forEach(exam => {
+    const examDate = new Date(exam.date + 'T00:00:00');
+    const daysUntil = Math.ceil((examDate - today) / (1000 * 60 * 60 * 24));
+    
+    let urgencyClass = '';
+    let timeText = '';
+    
+    if (daysUntil === 0) {
+      urgencyClass = 'urgent';
+      timeText = '¡HOY!';
+    } else if (daysUntil === 1) {
+      urgencyClass = 'urgent';
+      timeText = '¡MAÑANA!';
+    } else if (daysUntil <= 3) {
+      urgencyClass = 'soon';
+      timeText = `En ${daysUntil} días`;
+    } else {
+      timeText = `En ${daysUntil} días`;
+    }
+    
+    const formattedDate = examDate.toLocaleDateString('es-ES', {
+      day: 'numeric',
+      month: 'short'
+    });
+    
+    alertHTML += `
+      <div class="exam-alert-item ${urgencyClass}">
+        <span class="exam-alert-subject">${exam.subjectName}</span>
+        <span class="exam-alert-time">${timeText}</span>
+        <span class="exam-alert-date">(${formattedDate})</span>
+      </div>
+    `;
+  });
+  
+  alertHTML += '</div>';
+  
+  if (upcomingExams.length > 3) {
+    alertHTML += `<div class="exam-alerts-more">Y ${upcomingExams.length - 3} más...</div>`;
+  }
+  
+  alertContainer.innerHTML = alertHTML;
+  alertContainer.style.display = 'block';
 }
 
 // Generar PDF
