@@ -1115,9 +1115,12 @@ function crearTarjeta(nombre = 'Nueva asignatura', color = '#ff4d4d', doGuardar 
   });
 
   card.querySelector('.delete-btn').addEventListener('click', () => {
-    saveStateToHistory('eliminar asignatura');
-    card.remove();
-    guardar();
+    const subjectName = card.querySelector('.titulo').textContent;
+    if (confirm(`¿Eliminar la asignatura "${subjectName}"?\n\nEsta acción no se puede deshacer.`)) {
+      saveStateToHistory('eliminar asignatura');
+      card.remove();
+      guardar();
+    }
   });
 
   // Toggle progreso
