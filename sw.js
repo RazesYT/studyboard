@@ -1,4 +1,4 @@
-const CACHE_NAME = 'studyboard-v1';
+const CACHE_NAME = 'studyboard-v2';
 const urlsToCache = [
   '/studyboard/',
   '/studyboard/index.html',
@@ -15,7 +15,15 @@ self.addEventListener('install', (event) => {
         return cache.addAll(urlsToCache);
       })
   );
+  // Forzar activación inmediata
   self.skipWaiting();
+});
+
+// Manejar mensajes para skip waiting
+self.addEventListener('message', (event) => {
+  if (event.data && event.data.type === 'SKIP_WAITING') {
+    self.skipWaiting();
+  }
 });
 
 // Activación y limpieza de cachés antiguos

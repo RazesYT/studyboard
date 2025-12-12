@@ -1316,8 +1316,11 @@ ADD_BTN.addEventListener('click', () => {
 /* -------------------------
    Carga inicial
    ------------------------- */
-initDarkMode();
-showMenuScreen();
+// Esperar a que el DOM esté completamente cargado
+document.addEventListener('DOMContentLoaded', () => {
+  initDarkMode();
+  showMenuScreen();
+});
 
 /* -------------------------
    Modal / detalle de asignatura
@@ -3078,10 +3081,32 @@ if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('/studyboard/sw.js')
       .then((registration) => {
         console.log('✅ Service Worker registrado:', registration.scope);
+        
+        // Forzar actualización si hay un SW esperando
+        if (registration.waiting) {
+          registration.waiting.postMessage({ type: 'SKIP_WAITING' });
+        }
+        
+        // Actualizar cuando haya un nuevo SW
+        registration.addEventListener('updatefound', () => {
+          const newWorker = registration.installing;
+          newWorker.addEventListener('statechange', () => {
+            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+              // Nuevo SW instalado, recargar para usar la nueva versión
+              console.log('Nueva versión disponible, recargando...');
+              window.location.reload();
+            }
+          });
+        });
       })
       .catch((error) => {
         console.log('❌ Error al registrar Service Worker:', error);
       });
+  });
+  
+  // Recargar cuando el SW tome control
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    window.location.reload();
   });
 }
 
