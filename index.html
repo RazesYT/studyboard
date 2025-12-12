@@ -326,6 +326,22 @@ const undoHistory = [];
 const MAX_HISTORY_SIZE = 50;
 let isUndoing = false;
 
+// Función auxiliar para parsear números con coma, coma alta o punto como decimal
+function parseNumber(value) {
+  if (typeof value === 'number') return value;
+  if (!value) return 0;
+  
+  // Convertir a string y normalizar
+  let str = String(value).trim();
+  
+  // Reemplazar comas altas (') y comas (,) por punto (.)
+  str = str.replace(/[',]/g, '.');
+  
+  // Parsear el número
+  const num = parseFloat(str);
+  return isNaN(num) ? 0 : num;
+}
+
 function saveStateToHistory(actionType = 'cambio') {
   if (isUndoing) return; // No guardar durante un undo
   
@@ -888,8 +904,8 @@ function calcularNotaAsignatura(card) {
   let suma = 0;
   let totalPonderacion = 0;
   card._tests.forEach(t => {
-    const nota = parseFloat(t.nota) || 0;
-    const ponderacion = parseFloat(t.ponderacion) || 0;
+    const nota = parseNumber(t.nota);
+    const ponderacion = parseNumber(t.ponderacion);
     suma += nota * ponderacion;
     totalPonderacion += ponderacion;
   });
@@ -912,8 +928,8 @@ function actualizarNotasCards() {
         
         if (card._tests && card._tests.length > 0) {
           card._tests.forEach(t => {
-            const notaTest = parseFloat(t.nota) || 0;
-            const ponderacion = parseFloat(t.ponderacion) || 0;
+            const notaTest = parseNumber(t.nota);
+            const ponderacion = parseNumber(t.ponderacion);
             notaAcumulada += (notaTest * ponderacion) / 100;
             porcentajeEvaluado += ponderacion;
           });
@@ -936,7 +952,7 @@ function actualizarNotasCards() {
         // Lógica de emoji basada en probabilidad de aprobar
         if (porcentajeEvaluado >= 100) {
           // Todo evaluado, usar nota final
-          const notaFinal = parseFloat(nota);
+          const notaFinal = parseNumber(nota);
           if (notaFinal >= 9) emoji = '🎉';
           else if (notaFinal >= 7) emoji = '😊';
           else if (notaFinal >= 5) emoji = '🙂';
@@ -981,7 +997,7 @@ function actualizarProgresoCard(card) {
   
   let totalPonderacion = 0;
   card._tests.forEach(t => {
-    const ponderacion = parseFloat(t.ponderacion) || 0;
+    const ponderacion = parseNumber(t.ponderacion);
     totalPonderacion += ponderacion;
   });
   
@@ -1024,7 +1040,7 @@ function actualizarEstadisticas() {
   cards.forEach(card => {
     const nota = calcularNotaAsignatura(card);
     if (nota !== '-') {
-      sumaNotas += parseFloat(nota);
+      sumaNotas += parseNumber(nota);
       countNotas++;
     }
   });
@@ -1033,7 +1049,7 @@ function actualizarEstadisticas() {
   if (countNotas > 0) {
     const media = (sumaNotas / countNotas).toFixed(2);
     let emoji = '';
-    const mediaNum = parseFloat(media);
+    const mediaNum = parseNumber(media);
     if (mediaNum < 3) emoji = '😰';
     else if (mediaNum < 5) emoji = '😟';
     else if (mediaNum < 7) emoji = '😊';
@@ -1050,7 +1066,7 @@ function actualizarEstadisticas() {
   cards.forEach(card => {
     totalEcts += 6; // Cada asignatura vale 6 ECTS
     const nota = calcularNotaAsignatura(card);
-    if (nota !== '-' && parseFloat(nota) >= 5) {
+    if (nota !== '-' && parseNumber(nota) >= 5) {
       ectsAprobados += 6; // Solo contar si está aprobada (nota >= 5)
     }
   });
@@ -2154,9 +2170,9 @@ function closeCalculatorModal() {
 
 // Calcular nota necesaria
 function calculateNeededGrade() {
-  const currentGrade = parseFloat(document.getElementById('calc-current-grade').value) || 0;
-  const percentageDone = parseFloat(document.getElementById('calc-percentage-done').value) || 0;
-  const targetGrade = parseFloat(document.getElementById('calc-target-grade').value) || 5.0;
+  const currentGrade = parseNumber(document.getElementById('calc-current-grade').value);
+  const percentageDone = parseNumber(document.getElementById('calc-percentage-done').value);
+  const targetGrade = parseNumber(document.getElementById('calc-target-grade').value) || 5.0;
   
   const resultDiv = document.getElementById('calc-result');
   
