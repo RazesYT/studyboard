@@ -580,7 +580,7 @@ main { width: 100%; max-width: 520px; padding: 0 12px; }
 .btn {
   padding: 8px 12px; border-radius: 10px; border: none; cursor: pointer; font-weight:600;
 }
-.btn-ghost { background: rgba(255,255,255,0.08); color: white; }
+.btn-ghost { background: #1f2937; color: white; }
 .btn-primary { background: white; color: #0f172a; }
 
 /* Botón flotante genérico (FAB) */
@@ -2075,9 +2075,11 @@ main { width: 100%; max-width: 520px; padding: 0 12px; }
    MODAL EXÁMENES
    ------------------------- */
 .exams-modal {
-  max-width: 600px;
+  max-width: 600px !important;
   width: 90%;
-  height: 650px;
+  height: 650px !important;
+  max-height: 85vh !important;
+}
   max-height: 85vh;
 }
 
@@ -2329,13 +2331,21 @@ main { width: 100%; max-width: 520px; padding: 0 12px; }
   }
 
   .exams-modal {
-    max-width: 100%;
-    height: 85vh;
-    max-height: 90vh;
+    max-width: 100% !important;
+    width: 95% !important;
+    height: 80vh !important;
+    max-height: 80vh !important;
   }
   
   .exams-wrapper {
     height: 100%;
+    min-height: 0;
+  }
+
+  .modal-body {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow: hidden;
   }
 
   .btn-add-exam {
@@ -2351,14 +2361,17 @@ main { width: 100%; max-width: 520px; padding: 0 12px; }
     left: 12px;
     right: 12px;
     padding: 16px;
+    max-height: 60vh;
+    overflow-y: auto;
   }
   
   .exams-list {
     padding: 16px;
-    flex: 1 1 auto;
-    min-height: 0;
-    height: auto;
-    overflow-y: auto;
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    height: auto !important;
+    max-height: none !important;
+    overflow-y: auto !important;
   }
 
   .exam-item {
