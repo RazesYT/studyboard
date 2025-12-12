@@ -454,6 +454,12 @@ main { width: 100%; max-width: 520px; padding: 0 12px; }
   .titulo { font-size: 16px; }
   .card { padding: 14px; border-radius: 12px; }
   #add-btn { border-radius: 12px; width: 56px; height: 56px; }
+  
+  .tests-list {
+    max-height: 300px !important;
+    overflow-y: auto !important;
+  }
+  
   .test-row { font-size: 12px; gap: 6px; padding: 8px; }
   .test-name { flex: 1; min-width: 70px; }
   .test-grade { width: 50px; }
@@ -610,7 +616,13 @@ main { width: 100%; max-width: 520px; padding: 0 12px; }
   color: rgba(255, 255, 255, 0.5);
 }
 
-.tests-list { display: flex; flex-direction: column; gap: 10px; }
+.tests-list { 
+  display: flex; 
+  flex-direction: column; 
+  gap: 10px;
+  overflow-y: auto;
+  max-height: 400px;
+}
 
 .test-row {
   display: flex; 
