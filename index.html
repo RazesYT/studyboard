@@ -38,7 +38,7 @@
     <div class="modal" style="max-width: 480px; height: auto; max-height: none;">
       <div class="modal-header" style="background: linear-gradient(135deg, #4285f4 0%, #34a853 100%); position: relative;">
         <h2 class="modal-title">🔄 Sincronización en la Nube</h2>
-        <div class="app-version">v1.6.1</div>
+        <div class="app-version">v1.7.0</div>
       </div>
       <div class="modal-body">
         <div id="sync-code-content"></div>
@@ -297,6 +297,21 @@
             <div id="subjects-ranking"></div>
           </div>
         </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Detalles de Examen -->
+<div id="exam-detail-modal" class="modal-overlay" style="display:none;">
+  <div class="modal exam-detail-modal">
+    <div class="modal-header" style="background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);">
+      <h2 class="modal-title">📋 Detalles del Examen</h2>
+      <button class="close-modal-btn" onclick="closeExamDetailModal()" aria-label="Cerrar">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="exam-detail-content" id="exam-detail-content">
+        <!-- Los detalles se renderizarán aquí -->
       </div>
     </div>
   </div>
@@ -2797,7 +2812,7 @@ function checkUpcomingExams() {
     });
     
     alertHTML += `
-      <div class="exam-alert-item ${urgencyClass}">
+      <div class="exam-alert-item ${urgencyClass}" onclick="openExamDetailModal('${exam.id}')">
         <div class="exam-alert-subject">${exam.subjectName}</div>
         <div class="exam-alert-time">${timeText}</div>
         <div class="exam-alert-date">${formattedDate}</div>
@@ -2809,6 +2824,95 @@ function checkUpcomingExams() {
   
   alertContainer.innerHTML = alertHTML;
   alertContainer.style.display = 'block';
+}
+
+// Abrir modal de detalles del examen
+function openExamDetailModal(examId) {
+  const exam = exams.find(e => e.id === examId);
+  if (!exam) return;
+  
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const examDate = new Date(exam.date + 'T00:00:00');
+  const daysUntil = Math.ceil((examDate - today) / (1000 * 60 * 60 * 24));
+  
+  let urgencyClass = '';
+  let timeText = '';
+  
+  if (daysUntil === 0) {
+    urgencyClass = 'urgent';
+    timeText = '¡HOY!';
+  } else if (daysUntil === 1) {
+    urgencyClass = 'urgent';
+    timeText = '¡MAÑANA!';
+  } else if (daysUntil <= 3) {
+    urgencyClass = 'soon';
+    timeText = `En ${daysUntil} días`;
+  } else {
+    timeText = `En ${daysUntil} días`;
+  }
+  
+  const formattedDate = examDate.toLocaleDateString('es-ES', {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric'
+  });
+  
+  const formattedTime = exam.time || 'No especificada';
+  const location = exam.location || 'No especificada';
+  
+  const detailContent = document.getElementById('exam-detail-content');
+  detailContent.innerHTML = `
+    <div class="exam-detail-item">
+      <div class="exam-detail-label">Asignatura</div>
+      <div class="exam-detail-value large">${exam.subjectName}</div>
+    </div>
+    
+    <div class="exam-detail-item">
+      <div class="exam-detail-label">Fecha</div>
+      <div class="exam-detail-value">${formattedDate}</div>
+    </div>
+    
+    <div class="exam-detail-item">
+      <div class="exam-detail-label">Hora</div>
+      <div class="exam-detail-value">${formattedTime}</div>
+    </div>
+    
+    <div class="exam-detail-item">
+      <div class="exam-detail-label">Ubicación</div>
+      <div class="exam-detail-value">${location}</div>
+    </div>
+    
+    <div class="exam-detail-item">
+      <div class="exam-detail-label">Tiempo restante</div>
+      <div class="exam-detail-value ${urgencyClass}">${timeText}</div>
+    </div>
+    
+    <div class="exam-detail-actions">
+      <button class="btn btn-delete" onclick="deleteExamFromDetail('${exam.id}')">🗑️ Eliminar</button>
+      <button class="btn btn-close" onclick="closeExamDetailModal()">Cerrar</button>
+    </div>
+  `;
+  
+  document.getElementById('exam-detail-modal').style.display = 'flex';
+}
+
+// Cerrar modal de detalles del examen
+function closeExamDetailModal() {
+  document.getElementById('exam-detail-modal').style.display = 'none';
+}
+
+// Eliminar examen desde el modal de detalles
+function deleteExamFromDetail(examId) {
+  if (confirm('¿Estás seguro de que quieres eliminar este examen?')) {
+    exams = exams.filter(e => e.id !== examId);
+    saveExams();
+    closeExamDetailModal();
+    renderExams();
+    renderUpcomingExams();
+    showNotification('Examen eliminado correctamente');
+  }
 }
 
 // Generar PDF
