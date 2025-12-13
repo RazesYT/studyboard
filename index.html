@@ -38,7 +38,7 @@
     <div class="modal" style="max-width: 480px; height: auto; max-height: none;">
       <div class="modal-header" style="background: linear-gradient(135deg, #4285f4 0%, #34a853 100%); position: relative;">
         <h2 class="modal-title">🔄 Sincronización en la Nube</h2>
-        <div class="app-version">v1.8.4</div>
+        <div class="app-version">v1.9.0</div>
       </div>
       <div class="modal-body">
         <div id="sync-code-content"></div>
@@ -1618,7 +1618,40 @@ function renderTests() {
   testsList.innerHTML = '';
   if (!activeCard) return;
   activeCard._tests = activeCard._tests || [];
-  activeCard._tests.forEach((t, idx) => {
+  
+  // Ordenar pruebas: primero teoría/parciales, luego prácticas, ambos por número
+  const sortedTests = [...activeCard._tests].sort((a, b) => {
+    const nameA = (a.nombre || '').toLowerCase();
+    const nameB = (b.nombre || '').toLowerCase();
+    
+    // Detectar tipo (teoría/parcial vs práctica)
+    const isPracticaA = nameA.includes('práctica') || nameA.includes('practica');
+    const isPracticaB = nameB.includes('práctica') || nameB.includes('practica');
+    
+    // Si uno es práctica y otro no, teoría/parcial va primero
+    if (isPracticaA !== isPracticaB) {
+      return isPracticaA ? 1 : -1;
+    }
+    
+    // Extraer números del nombre
+    const numA = parseInt(nameA.match(/\d+/)?.[0] || '999');
+    const numB = parseInt(nameB.match(/\d+/)?.[0] || '999');
+    
+    // Ordenar por número
+    if (numA !== numB) {
+      return numA - numB;
+    }
+    
+    // Si tienen el mismo número, ordenar alfabéticamente
+    return nameA.localeCompare(nameB);
+  });
+  
+  sortedTests.forEach((t, idx) => {
+    // Encontrar índice original para mantener referencias correctas
+    const originalIdx = activeCard._tests.indexOf(t);
+    
+    const row = document.createElement('div');
+    row.className = 'test-row';
     const row = document.createElement('div');
     row.className = 'test-row';
     row.innerHTML = `
@@ -1637,19 +1670,20 @@ function renderTests() {
     const delBtn = row.querySelector('.delete-test');
 
     nameInput.addEventListener('input', (e) => {
-      activeCard._tests[idx].nombre = e.target.value;
+      activeCard._tests[originalIdx].nombre = e.target.value;
       guardar();
+      renderTests(); // Re-renderizar para reordenar
     });
     gradeInput.addEventListener('input', (e) => {
-      activeCard._tests[idx].nota = e.target.value;
+      activeCard._tests[originalIdx].nota = e.target.value;
       guardar();
     });
     weightInput.addEventListener('input', (e) => {
-      activeCard._tests[idx].ponderacion = e.target.value;
+      activeCard._tests[originalIdx].ponderacion = e.target.value;
       guardar();
     });
     delBtn.addEventListener('click', () => {
-      activeCard._tests.splice(idx, 1);
+      activeCard._tests.splice(originalIdx, 1);
       renderTests();
       guardar();
     });
