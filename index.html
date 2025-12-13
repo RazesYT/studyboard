@@ -1619,21 +1619,21 @@ function renderTests() {
   if (!activeCard) return;
   activeCard._tests = activeCard._tests || [];
   
-  // Ordenar pruebas: primero teoría/parciales, luego prácticas, ambos por número
+  // Ordenar pruebas: parciales/teoría arriba, prácticas abajo, por número
   const sortedTests = [...activeCard._tests].sort((a, b) => {
     const nameA = (a.nombre || '').toLowerCase();
     const nameB = (b.nombre || '').toLowerCase();
     
-    // Detectar tipo (teoría/parcial vs práctica)
+    // Detectar tipo (práctica vs parcial/teoría)
     const isPracticaA = nameA.includes('práctica') || nameA.includes('practica');
     const isPracticaB = nameB.includes('práctica') || nameB.includes('practica');
     
-    // Si uno es práctica y otro no, teoría/parcial va primero
+    // Primero ordenar por tipo: parciales/teoría (false) antes que prácticas (true)
     if (isPracticaA !== isPracticaB) {
       return isPracticaA ? 1 : -1;
     }
     
-    // Extraer números del nombre
+    // Extraer número del nombre (buscar primer número)
     const numA = parseInt(nameA.match(/\d+/)?.[0] || '999');
     const numB = parseInt(nameB.match(/\d+/)?.[0] || '999');
     
@@ -1649,9 +1649,6 @@ function renderTests() {
   sortedTests.forEach((t, idx) => {
     // Encontrar índice original para mantener referencias correctas
     const originalIdx = activeCard._tests.indexOf(t);
-    
-    const row = document.createElement('div');
-    row.className = 'test-row';
     const row = document.createElement('div');
     row.className = 'test-row';
     row.innerHTML = `
@@ -1690,7 +1687,7 @@ function renderTests() {
 
     testsList.appendChild(row);
   });
-  if (activeCard._tests.length === 0) {
+  if (sortedTests.length === 0) {
     testsList.innerHTML = '<div style="color:#475569">No hay pruebas. Pulsa "Añadir prueba" para crear una.</div>';
   }
   actualizarNotasCards();
